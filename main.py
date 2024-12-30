@@ -29,10 +29,10 @@ def main():
     print("\nCompulsory activities standard deviation:\n", compulsory_activities_standard_deviation)
     print("\nOptional activities standard deviation:\n", optional_activities_standard_deviation)
 
-    da.pca_process(exams_data, 0.95) # Perform PCA on the exams data
-    da.pca_process(homework_data, 0.95) # Perform PCA on the homework data
-    da.pca_process(compulsory_activities_data, 0.95) # Perform PCA on the compulsory activities data
-    da.pca_process(optional_activities_data, 0.95) # Perform PCA on the optional activities data
+    da.pca_process(exams_data, 0.95, 'Exams_PCA') # Perform PCA on the exams data
+    da.pca_process(homework_data, 0.95, 'Homework_PCA') # Perform PCA on the homework data
+    da.pca_process(compulsory_activities_data, 0.95, 'Compulsory_activities_PCA') # Perform PCA on the compulsory activities data
+    da.pca_process(optional_activities_data, 0.95, 'Optional_activities_PCA') # Perform PCA on the optional activities data
 
 if __name__ == '__main__':
     main()
