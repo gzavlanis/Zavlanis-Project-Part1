@@ -1,4 +1,7 @@
 from sklearn.decomposition import PCA
+from sklearn.linear_model import SGDRegressor
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import StandardScaler
 from scipy import stats
 import numpy as np
 import pandas as pd
@@ -29,4 +32,29 @@ def pca_process(data, percentage, dataset_name): # Define the function that perf
     pc_values = np.arange(pca.n_components_) + 1 # Create an array of the principal component values
 
     dp.scree_plot(pc_values, pca.explained_variance_ratio_, 'Principal Component', 'Explained Variance', 'Scree plot of principal components', f'./Plots/{dataset_name}_Scree.png', 'blue') # Create a scree plot of the principal components
-    dp.scatter_plot(10, 10, transformed_data_df['PC1'], transformed_data_df['PC2'],'PC1', 'PC2', 'Scatter plot of principal components', f'./Plots/{dataset_name}.png') # Create a scatter plot of the transformed data
+    dp.scatter_plot(transformed_data_df['PC1'], transformed_data_df['PC2'],'PC1', 'PC2', 'Scatter plot of principal components', f'./Plots/{dataset_name}.png') # Create a scatter plot of the transformed data
+
+def hypothesis_testing(group1, group2):
+    return stats.ttest_ind(group1, group2) # Perform a t-test on the two groups
+
+def create_gradient_descent_dataset(original_data):
+    original_data['Exam'] = original_data[['Final Exam', 'Repeat Exam']].max(axis=1)  # Create a new column 'Exam' based on the final and repeat exam grades
+    original_data.drop(['Final Exam', 'Repeat Exam'], axis = 1, inplace = True)  # Drop the final and repeat exam columns
+    X = original_data.drop(columns = ['Exam'])  # Get the features
+    y = original_data['Exam']  # Get the target
+
+    scaler = StandardScaler()  # Create a StandardScaler object
+    X_scaled = scaler.fit_transform(X)  # Scale the features
+    return X_scaled, y
+
+def gradient_descent_process(X, y):
+    model = SGDRegressor(max_iter = 1000, tol = 1e-3, learning_rate = 'constant', eta0 = 0.01) # Create a SGDRegressor object
+    model.fit(X, y) # Fit the model to the data
+    predictions = model.predict(X) # Make predictions
+    mse = mean_squared_error(y, predictions) # Calculate the mean squared error
+
+    print("\nOptimized Parameters (Theta):", model.coef_)
+    print("\nBias Term (Intercept):", model.intercept_)
+    print("\nMean Squared Error:", mse)
+
+    dp.plot_of_actual_and_predicted(X[:, 0], y, predictions, 'X (scaled)', 'Exam', 'Actual vs Predicted Exam Marks', './Plots/Actual_vs_Predicted_Exam_Marks.png') # Create a plot of the actual and predicted exam marks
