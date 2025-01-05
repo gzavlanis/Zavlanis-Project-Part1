@@ -1,3 +1,5 @@
+from unittest.mock import inplace
+
 from sklearn.decomposition import PCA
 from sklearn.linear_model import SGDRegressor
 from sklearn.metrics import mean_squared_error
@@ -41,11 +43,37 @@ def create_gradient_descent_dataset(original_data):
     original_data['Exam'] = original_data[['Final Exam', 'Repeat Exam']].max(axis=1)  # Create a new column 'Exam' based on the final and repeat exam grades
     original_data.drop(['Final Exam', 'Repeat Exam'], axis = 1, inplace = True)  # Drop the final and repeat exam columns
     X = original_data.drop(columns = ['Exam'])  # Get the features
+    X['Mean_Homework'] = X.iloc[:, :3].mean(axis = 1)
+    X['Mean_Compulsory_Activities'] = X.iloc[:, 4:11].mean(axis = 1)
+    X['Mean_Optional_Activities'] = X.iloc[:, 12:21].mean(axis = 1)
+    X.drop([
+        'Homework 1',
+        'Homework 2',
+        'Homework 3',
+        'Homework 4',
+        'Compulsory Activity 1',
+        'Compulsory Activity 2',
+        'Compulsory Activity 3',
+        'Compulsory Activity 4',
+        'Compulsory Activity 5',
+        'Compulsory Activity 6',
+        'Compulsory Activity 7',
+        'Compulsory Activity 8',
+        'Optional Activity 1',
+        'Optional Activity 2',
+        'Optional Activity 3',
+        'Optional Activity 4',
+        'Optional Activity 5',
+        'Optional Activity 6',
+        'Optional Activity 7',
+        'Optional Activity 8',
+        'Optional Activity 9',
+        'Optional Activity 10'
+    ], axis = 1, inplace = True)
     y = original_data['Exam']  # Get the target
-
     scaler = StandardScaler()  # Create a StandardScaler object
     X_scaled = scaler.fit_transform(X)  # Scale the features
-    return X_scaled, y
+    return X, X_scaled, y
 
 def gradient_descent_process(X, y):
     model = SGDRegressor(max_iter = 1000, tol = 1e-3, learning_rate = 'constant', eta0 = 0.01) # Create a SGDRegressor object
@@ -58,3 +86,21 @@ def gradient_descent_process(X, y):
     print("\nMean Squared Error:", mse)
 
     dp.plot_of_actual_and_predicted(X[:, 0], y, predictions, 'X (scaled)', 'Exam', 'Actual vs Predicted Exam Marks', './Plots/Actual_vs_Predicted_Exam_Marks.png') # Create a plot of the actual and predicted exam marks
+
+def predict(X, theta):
+    return np.dot(X, theta)
+
+def compute_cost(X, y, theta):
+    m = len(y)
+    predictions = predict(X, theta)
+    return (1 / (2 * m)) * np.sum((predictions - y) ** 2)
+
+def custom_gradient_descent(X, y, theta, alpha, num_iters):
+    m = len(y)
+    cost_history = np.zeros(num_iters)
+
+    for i in range(num_iters):
+        predictions = predict(X, theta)
+        theta -= (alpha / m) * np.dot(X.T, (predictions - y))
+        cost_history[i] = compute_cost(X, y, theta)
+    return theta, cost_history

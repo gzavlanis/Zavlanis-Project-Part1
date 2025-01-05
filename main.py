@@ -1,5 +1,7 @@
 from Data_Processing import DataProcessing
 import Data_Analytics as da
+import Data_Plots as dp
+import numpy as np
 
 def main():
     dataProcessing = DataProcessing() # Create an instance of the DataProcessing class
@@ -44,9 +46,21 @@ def main():
 
     print("Hypothesis testing results:\n", da.hypothesis_testing(mean_homework_mark, exam_result)) # Perform a t-test on the two groups
 
-    # Try to predict the exams mark based on their performance in homework and activities:
-    X_scaled, y = da.create_gradient_descent_dataset(original_data) # Create the dataset for gradient descent
+    # Try to predict the exams mark based on their performance in homework and activities using Gradient Descent:
+    X, X_scaled, y = da.create_gradient_descent_dataset(original_data) # Create the dataset for gradient descent
     da.gradient_descent_process(X_scaled, y) # Perform gradient descent on the dataset
+
+    # Make the same with the previous process, but using a "Handmade" Gradient Descent function:
+    X = np.c_[np.ones(X.shape[0]), X] # Add a column of ones for the bias term
+
+    # Initialize parameters
+    theta = np.zeros(X.shape[1])
+    alpha = 0.01 # The learning rate
+    num_iters = 1000 # The number of iterations
+
+    theta, cost_history = da.custom_gradient_descent(X, y, theta, alpha, num_iters)
+    print("Theta (model parameters): ", theta)
+    print("Final cost: ", cost_history[-1])
 
 if __name__ == '__main__':
     main()
