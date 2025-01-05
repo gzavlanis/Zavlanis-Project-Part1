@@ -29,8 +29,8 @@ class DataProcessing:
         return self.exams_data, self.homework_data, self.compulsory_activities_data, self.optional_activities_data, self.original_data
 
     def pass_the_exams(self):
-        self.exams_data['Pass'] = self.exams_data.apply(lambda row: 0 if row['Final'] >= 5 or row['Repeat'] >= 5 else 1, axis = 1) # Create a new column 'Pass' based on the final and repeat exam grades
-        return self.exams_data
+        self.original_data['Pass Actual'] = self.original_data.apply(lambda row: 0 if row['Final Exam'] >= 5 or row['Repeat Exam'] >= 5 else 1, axis = 1) # Create a new column 'Pass' based on the final and repeat exam grades
+        return self.original_data
 
     def create_hypothesis_testing_dataset(self):
         mean_homework_mark = self.homework_data.mean(axis = 1) # Calculate the mean homework mark

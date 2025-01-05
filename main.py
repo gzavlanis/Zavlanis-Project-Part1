@@ -1,7 +1,7 @@
 from Data_Processing import DataProcessing
 import Data_Analytics as da
-import Data_Plots as dp
 import numpy as np
+import pandas as pd
 
 def main():
     dataProcessing = DataProcessing() # Create an instance of the DataProcessing class
@@ -48,7 +48,14 @@ def main():
 
     # Try to predict the exams mark based on their performance in homework and activities using Gradient Descent:
     X, X_scaled, y = da.create_gradient_descent_dataset(original_data) # Create the dataset for gradient descent
-    da.gradient_descent_process(X_scaled, y) # Perform gradient descent on the dataset
+    predictions = da.gradient_descent_process(X_scaled, y) # Perform gradient descent on the dataset and keep predictions
+
+    # Create the Pass Actual and Pass Predicted columns where if Exam results is >= 5 then the value is 0 else is 1
+    predictions_df = pd.DataFrame({'predictions': predictions})
+    original_data['Pass Actual'] = original_data.apply(lambda row: 0 if row['Exam'] >= 5 else 1, axis = 1)
+    original_data['Pass Predicted'] = predictions_df['predictions'].apply(lambda x: 0 if x >= 5 else 1)
+
+    da.confusion_matrix_application(original_data['Pass Actual'], original_data['Pass Predicted']) # Create the confusion matrix of predicted and actual pass results:
 
     # Make the same with the previous process, but using a "Handmade" Gradient Descent function:
     X = np.c_[np.ones(X.shape[0]), X] # Add a column of ones for the bias term

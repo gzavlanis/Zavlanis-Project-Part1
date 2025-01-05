@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+import seaborn as sns
 
 def scatter_plot(x, y, xlabel, ylabel, title, directory):
     plt.scatter(x, y, alpha = 0.5, s = 70)
@@ -24,5 +25,13 @@ def plot_of_actual_and_predicted(X, y, predictions, xlabel, ylabel, title, direc
     plt.ylabel(ylabel)
     plt.title(title)
     plt.legend()
+    plt.show()
+    plt.savefig(directory)
+
+def plot_confusion_matrix(cm, xlabel, ylabel, title, directory):
+    sns.heatmap(cm, annot = True, fmt = 'd', cmap = 'Blues')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
     plt.show()
     plt.savefig(directory)

@@ -2,7 +2,7 @@ from unittest.mock import inplace
 
 from sklearn.decomposition import PCA
 from sklearn.linear_model import SGDRegressor
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, confusion_matrix
 from sklearn.preprocessing import StandardScaler
 from scipy import stats
 import numpy as np
@@ -40,7 +40,7 @@ def hypothesis_testing(group1, group2):
     return stats.ttest_ind(group1, group2) # Perform a t-test on the two groups
 
 def create_gradient_descent_dataset(original_data):
-    original_data['Exam'] = original_data[['Final Exam', 'Repeat Exam']].max(axis=1)  # Create a new column 'Exam' based on the final and repeat exam grades
+    original_data['Exam'] = original_data[['Final Exam', 'Repeat Exam']].max(axis = 1)  # Create a new column 'Exam' based on the final and repeat exam grades
     original_data.drop(['Final Exam', 'Repeat Exam'], axis = 1, inplace = True)  # Drop the final and repeat exam columns
     X = original_data.drop(columns = ['Exam'])  # Get the features
     X['Mean_Homework'] = X.iloc[:, :3].mean(axis = 1)
@@ -86,6 +86,7 @@ def gradient_descent_process(X, y):
     print("\nMean Squared Error:", mse)
 
     dp.plot_of_actual_and_predicted(X[:, 0], y, predictions, 'X (scaled)', 'Exam', 'Actual vs Predicted Exam Marks', './Plots/Actual_vs_Predicted_Exam_Marks.png') # Create a plot of the actual and predicted exam marks
+    return predictions
 
 def predict(X, theta):
     return np.dot(X, theta)
@@ -104,3 +105,8 @@ def custom_gradient_descent(X, y, theta, alpha, num_iters):
         theta -= (alpha / m) * np.dot(X.T, (predictions - y))
         cost_history[i] = compute_cost(X, y, theta)
     return theta, cost_history
+
+def confusion_matrix_application(y_true, y_pred):
+    cm = confusion_matrix(y_true, y_pred)
+    print(cm)
+    dp.plot_confusion_matrix(cm, 'Predicted', 'Actual', 'Confusion Matrix of Gradient Descent Predictions', './Plots/Confusion_Matrix.png')
